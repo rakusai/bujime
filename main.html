@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Content-Script-Type" content="text/javascript" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <title>無事.me</title>
+    <link href="/css/nd/nd.css" media="screen, projection" rel="stylesheet" type="text/css" />
+    <link href="/css/lib/jquery.fancybox-1.3.4.css" media="screen, projection" rel="stylesheet" type="text/css" />
+    <link href="/css/layout.css" media="screen, projection" rel="stylesheet" type="text/css" />
+    <link href="/css/buji.css" media="screen, projection" rel="stylesheet" type="text/css" />
+    <script src="/js/lib/jquery-1.4.2.js" type="text/javascript"></script>
+    <script src="/js/lib/jquery.idTabs.min.js" type="text/javascript"></script>
+    <script src="/js/lib/jquery.fancybox/jquery.mousewheel-3.0.4.pack.js" type="text/javascript"></script>
+    <script src="/js/lib/jquery.fancybox/jquery.fancybox-1.3.4.pack.js" type="text/javascript"></script>
+    <script src="/js/twitter.js" type="text/javascript"></script>
+    <script src="/js/buji.js" type="text/javascript"></script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="header">
+        <div class="w">
+          <a href="http://www.twitter.com/bujime" target="_blank" id="h-follow"><img src="http://twitter-badges.s3.amazonaws.com/follow_me-b.png" alt="Follow bujime on Twitter"/></a>
+          <h1><a href="/"><img src="/img/logo.png" alt="無事.me" /></a></h1>
+          <p><a href="https://spreadsheets.google.com/viewform?formkey=dGdqTXJYeGRZdU5kVzBKRU1CaTM2YkE6MQ&ifq" target="_blank" id="add">被災地の無事を確認<br />したことを報告する</a>
+          被災地にいる大切なひとと連絡がつかず、<br />やきもきしている人がわたしたちの周りにはたくさんいます。<br />このサイトは安否確認ではなく、気になる地域の"無事"情報を集めます。</p>
+        </div>
+      </div>
+      <div id="content">
+        <div class="w">
+
+          <div id="focus-tab" class="tab-ui">
+<!--
+            <div class="tab-ui-header">
+              <ul class="h idTabs"> 
+                <li><a href="#by-confirm">被災地と連絡がつかない方へ</a></li>
+                <li><a href="#by-share">被災地と連絡がつき無事を確認した方へ</a></li>
+              </ul>
+            </div>
+-->
+            <div class="tab-ui-content">
+              <div id="by-confirm">
+                <div id="confirm">
+                  <div class="c-head">
+<!--                     <h2>被災地と連絡がつかない方へ</h2> -->
+                    <p>被災地と連絡がつかない方へ</p>
+                  </div>
+                  <div class="c-content">
+                    <form method="get">
+                      <table>
+                        <tr class="pref">
+                          <th><label for="confirm_pref">都道府県・市区町村</label></th>
+                          <td><input id="confirm_pref" type="text" name="q" value="<?= htmlspecialchars($q) ?>" placeholder="〇〇県" required /></td>
+                        </tr>
+<!--
+                        <tr class="city">
+                          <th><label for="confirm_city">市区町村</label></th>
+                          <td><input id="confirm_city" type="text" value="" placeholder="□□市△△町" required /></td>
+                        </tr>
+-->
+                      </table>
+                      <p class="btn"><input id="confirm_submit" type="submit" class="action" value="無事を確認する" /></p>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="w">
+          <div id="recent">
+            <h2>過去60分以内の無事報告</h2>
+            <table>
+              <? foreach($rows as $key => $row ){ ?>
+                <tr>
+                  <td class="time"><?= $row["month"] ?> / <?= $row["day"] ?> / <?= $row["hour"] ?></td>
+                  <td class="pref"><?= $row["pref"] ?> <?= $row["city"] ?><br /><?= $row["status"] ?></td>
+                  <td class="comment"><?= $row["comment"] ?><br /><small>投稿日：<?= $row["time"] ?></small></td>
+                </tr>
+              <? } ?>
+            </table>
+<!--             <a href="">もっと見る</a> -->
+          </div>
+        </div>
+
+        <div class="w">
+          <div id="bujime-fav">
+            <h2>@Bujime Fav</h2>
+            <img src="/img/loader.gif" class="loader" />
+          </div>
+        </div>
+
+
+<!--
+        <div class="w">
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+        <div id="cities">
+          <ul>
+            <li><a href="#">仙台</a></li>
+            <li><a href="#">青森</a></li>
+            <li><a href="#">岩手</a></li>
+            <li><a href="#">新潟</a></li>
+          </ul>
+        </div>
+
+        <div id="bujime">
+          <div id="bujime-follow">
+            <p><a href="http://www.twitter.com/bujime" target="_blank"><img src="http://twitter-badges.s3.amazonaws.com/follow_me-b.png" alt="Follow bujime on Twitter"/></a></p>
+          </div>
+          <div id="bujime-fav">
+            <p>@Bujime Fav</p>
+            <img src="/img/loader.gif" class="loader" />
+          </div>
+        </div>
+
+        <div id="tweets-hash">
+        </div>
+-->
+
+
+      </div>
+      <div id="footer">
+        <div class="w">
+
+          
+        </div>
+      </div>
+    </div>
+
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-21996649-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+  </body>
+</html>

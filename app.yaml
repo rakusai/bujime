@@ -1,0 +1,25 @@
+application: buji-me
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+
+- url: /css
+  static_dir: public/css
+
+- url: /js
+  static_dir: public/js
+
+- url: /swf
+  static_dir: public/swf
+
+- url: /img
+  static_dir: public/img
+
+- url: /favicon.ico
+  static_files: public/img/favicon.png
+  upload: public/img/favicon.png
+
+- url: /.*
+  script: main.py

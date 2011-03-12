@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Buji.me</title>
+  </head>
+  <body>
+    <h1>Buji.me</h1>
+    
+    
+    {% for row in rows %}
+    <p style="border-bottom:1px solid gray">    
+    {{row.time}} / 
+    {{row.pref}} / 
+    {{row.city}} / 
+    {{row.month}} / 
+    {{row.day}} / 
+    {{row.hour}} / 
+    {{row.status}} / 
+    {{row.comment}}
+
+    </p>
+    {% endfor %}
+
+    <a target="_blank" href="https://spreadsheets.google.com/viewform?formkey=dGdqTXJYeGRZdU5kVzBKRU1CaTM2YkE6MQ&ifq">新規投稿</a> / 
+    <a target="_blank" href="https://spreadsheets5.google.com/ccc?hl=ja&key=tgjMrXxdYuNdW0JEMBi36bA&hl=ja#gid=0">編集</a>
+
+  </body>
+</html>
