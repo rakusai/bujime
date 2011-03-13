@@ -16,7 +16,7 @@ from google.appengine.api import urlfetch
 from google.appengine.api import memcache
 import urllib
 
-def getjson(q,page,limit,version,status):
+def getjson(q,page,limit,version,status,link):
         sql = "" #"select * "
         sql = urllib.quote(sql)
 #        url = "http://spreadsheets.google.com/tq?key=twenqTTEoUUigkPWhKdHhUA&tq=" + sql
@@ -60,6 +60,23 @@ def getjson(q,page,limit,version,status):
             logging.info(row["c"][0]["v"])
             logging.info(row["c"][1]["v"])
             logging.info(row["c"][2]["v"])
+            comment = row["c"][7]["v"]
+            if link == 'yes': 
+                cgi.escape(comment)
+    #            comment = re.sub(r'(https?:\/\/[a-zA-Z0-9_\.\/\~\%\:\#\?=&\;\-,]+)',ur'<a href="\1" target="_blank">\1</a>' , comment)
+                # [[ ]] ブロック
+                def subblock(m):
+                    ch = m.group(1) # マッチ・オブジェクトmのgroup(0)は、ヒットした文字列を取り出す。
+                    lb = ch
+                    if len(ch) > 50:
+                        lb = ch[0:50] + "..."
+                    ch = '<a href="'+ch+'" target="_blank">'+lb+'</a>'
+                    return ch
+                    
+                block = re.compile(r'(https?:\/\/[a-zA-Z0-9_\.\/\~\%\:\#\?=&\;\-,]+)')
+                comment = block.sub(subblock,comment) 
+                comment = re.sub("@(\w+)",'<a target="_blank" href="http://twitter.com/\\1">@\\1</a>',comment)
+            
             newrows.append({
             "time" : row["c"][0]["f"],#ここだけf
             "pref" : row["c"][1]["v"],
@@ -68,7 +85,8 @@ def getjson(q,page,limit,version,status):
             "day" : row["c"][4]["v"],
             "hour" : row["c"][5]["v"],
             "status" : row["c"][6]["v"],
-            "comment" : row["c"][7]["v"],
+            "comment" : comment,
+#            "comment" : row["c"][7]["v"],
             })
         rows = newrows
         if q:
@@ -114,8 +132,9 @@ class MainPage(BasePage):
         limit = int(self.request.get("limit",60)) or 60
         version = int(self.request.get("ver",1)) or 1
         status = self.request.get("status")
+        link = self.request.get("link","")
         
-        newrows = getjson(q, page, limit,version,status)
+        newrows = getjson(q, page, limit,version,status,link)
             
         if format == "json":
             self.render_json(newrows)
