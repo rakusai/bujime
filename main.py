@@ -16,7 +16,7 @@ from google.appengine.api import urlfetch
 from google.appengine.api import memcache
 import urllib
 
-def getjson(q,page,limit,version):
+def getjson(q,page,limit,version,status):
         sql = "" #"select * "
         sql = urllib.quote(sql)
 #        url = "http://spreadsheets.google.com/tq?key=twenqTTEoUUigkPWhKdHhUA&tq=" + sql
@@ -76,7 +76,20 @@ def getjson(q,page,limit,version):
             for row in rows:
                 if re.search(q,row["pref"] + row["city"]):
                     newrows.append(row)
-                    
+        
+        rows = newrows
+        if status:
+            newrows = []
+            for row in rows:
+                sq = status
+                if status == "yes":
+                    sq = u"確認できました"                    
+                elif status == "no":
+                    sq = u"確認できませんでした"                    
+
+                if re.search(sq,row["status"]):
+                    newrows.append(row)
+        
         newrows.reverse()
         count = len(newrows)
         newrows = newrows[(page-1)*limit:page*limit]
@@ -100,8 +113,9 @@ class MainPage(BasePage):
         page = int(self.request.get("page",1)) or 1
         limit = int(self.request.get("limit",60)) or 60
         version = int(self.request.get("ver",1)) or 1
+        status = self.request.get("status")
         
-        newrows = getjson(q, page, limit,version)
+        newrows = getjson(q, page, limit,version,status)
             
         if format == "json":
             self.render_json(newrows)
