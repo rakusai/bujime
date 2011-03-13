@@ -3,6 +3,11 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Buji.me</title>
+    <style>
+    code {
+    color:green;
+    }
+    </style>
   </head>
   <body>
     <h1>Buji.me</h1>
@@ -24,6 +29,20 @@
 
     <a target="_blank" href="https://spreadsheets.google.com/viewform?formkey=dGdqTXJYeGRZdU5kVzBKRU1CaTM2YkE6MQ&ifq">新規投稿</a> / 
     <a target="_blank" href="https://spreadsheets5.google.com/ccc?hl=ja&key=tgjMrXxdYuNdW0JEMBi36bA&hl=ja#gid=0">編集</a>
+    <hr />
+    <h4>JSON API仕様</h4>
+    <p>
+    パラメーター<br />
+    <code>format</code> 出力フォーマット <code>format=json</code>を指定してください。指定しないとテスト用のHTML（このページ）が出力されます。 <br />
+    <code>q</code> 検索クエリーを文字列で指定。デフォルトは指定なし。指定しないまたは空文字だと最新情報が出力される。検索対象は県と市町村<br />
+    <code>page</code> ページ番号を数値で指定。1から始まる。デフォルトは1<br />
+    <code>limit</code> 出力件数を数値で指定。デフォルトは60<br />
+    <code>callback</code> JSONPの関数名を指定可能。デフォルトは指定無し<br />
+    </p>
+    <p>
+    サンプル<br />
+    <a href="/?format=json&page=1&limit=5">/?format=json&page=1&limit=5</a>
+    </p>
 
   </body>
 </html>

@@ -16,17 +16,17 @@ from google.appengine.api import urlfetch
 from google.appengine.api import memcache
 import urllib
 
-def getjson(q):
+def getjson(q,page,limit,version):
         sql = "" #"select * "
         sql = urllib.quote(sql)
 #        url = "http://spreadsheets.google.com/tq?key=twenqTTEoUUigkPWhKdHhUA&tq=" + sql
 
-#        res = memcache.get("cache")
-#        if not res:
-        url = "http://spreadsheets.google.com/tq?key=tgjMrXxdYuNdW0JEMBi36bA"
-        result = urlfetch.fetch(url)
-        res  = result.content
-#            memcache.set("cache",res,20)
+        res = memcache.get("cache")
+        if not res:
+            url = "http://spreadsheets.google.com/tq?key=tgjMrXxdYuNdW0JEMBi36bA"
+            result = urlfetch.fetch(url)
+            res  = result.content
+            memcache.set("cache",res,20)
             
 #        return
         res = res.replace("google.visualization.Query.setResponse(","")
@@ -50,7 +50,7 @@ def getjson(q):
        # res = '{"name": "John Smith", "age": 33}'
         
         json = simplejson.loads(res)
-        logging.info(json)
+#        logging.info(json)
         
         newrows = []
         
@@ -76,22 +76,37 @@ def getjson(q):
             for row in rows:
                 if re.search(q,row["pref"] + row["city"]):
                     newrows.append(row)
-            newrows = newrows[0:60]
-
+                    
         newrows.reverse()
-        return newrows
+        count = len(newrows)
+        newrows = newrows[(page-1)*limit:page*limit]
+
+        result = None
+        if version == 1:
+            result = newrows
+        else:            
+            result = {"count":count,
+                    "page" : page,
+                    "maxpage":int(count/limit)+1,
+                    "rows":newrows}
+
+        return result
         
 class MainPage(BasePage):
     def get(self):
 
         q = self.request.get("q")
         format = self.request.get("format")
+        page = int(self.request.get("page",1)) or 1
+        limit = int(self.request.get("limit",60)) or 60
+        version = int(self.request.get("ver",1)) or 1
         
-        newrows = getjson(q)
+        newrows = getjson(q, page, limit,version)
             
         if format == "json":
-            test = simplejson.dumps(newrows, ensure_ascii=False)
-            self.response.out.write(test)
+            self.render_json(newrows)
+#            test = simplejson.dumps(newrows, ensure_ascii=False)
+#            self.response.out.write(test)
         else:
             templates = {
             "rows" : newrows
