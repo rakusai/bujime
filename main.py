@@ -39,7 +39,7 @@ def getjson(response,q,page,limit,version,status,link):
         res = res.replace("#0.###############","")
         res = re.sub("('style'\:\'[^\']+\')","",res)
         res = re.sub("new Date\(([\d\,]+)\)","'\\1'",res)
-#        res = res.replace('c:[,','c:[{v:\'\',f:\'\'},') #google spread sheetのバグ。日付型に文字がはいっているとオブジェクトが出力されない
+        res = res.replace('c:[,','c:[{v:\'\',f:\'\'},') #google spread sheetのバグ。日付型に文字がはいっているとオブジェクトが出力されない
 
 
         res = re.sub("([{,])([a-z]+)\:","\\1'\\2':",res) #変数名をクオーテーションで囲む
