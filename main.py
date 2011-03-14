@@ -23,47 +23,48 @@ def getjson(response,q,page,limit,version,status,link):
         sql = urllib.quote(sql)
 #        url = "http://spreadsheets.google.com/tq?key=twenqTTEoUUigkPWhKdHhUA&tq=" + sql
         
-        fromcache = True
-        res = memcache.get("cache")
-        if not res:
-            fromcache = False
+        json = None 
+        json = memcache.get("cache_json")
+        if not json:
             url = "http://spreadsheets.google.com/tq?key=tgjMrXxdYuNdW0JEMBi36bA"
             result = urlfetch.fetch(url)
             res  = result.content
-            memcache.set("cache",res,20)
             
-#        return
-        res = res.replace("google.visualization.Query.setResponse(","")
-        res = re.sub("\)\;$","",res)
-        res = res.replace("yyyy/MM/dd H:mm:ss","")
-        res = res.replace("#0.###############","")
-        res = re.sub("('style'\:\'[^\']+\')","",res)
-        res = re.sub("new Date\(([\d\,]+)\)","'\\1'",res)
-        res = res.replace('c:[,','c:[{v:\'\',f:\'\'},') #google spread sheetのバグ。日付型に文字がはいっているとオブジェクトが出力されない
-
-
-        res = re.sub("([{,])([a-z]+)\:","\\1'\\2':",res) #変数名をクオーテーションで囲む
-        res = re.sub(":([0-9]+)\.[0-9]+",":'\\1'",res) #小数点
-        res = res.replace('"','')
-        res = res.replace("\\n",' ')
-        res = res.replace("},","},\n") #改行をいれてデバッグしやすく
-        res = res.replace("'",'"') #ダブルクオーテーションじゃないとパースしてくれない
-#        response.out.write(res)
-#        return
-#        self.response.out.write(res)
-#        logging.info(res)
-       # res = '{"name": "John Smith", "age": 33}'
-        
-        try:
-            json = simplejson.loads(res)
-        except:
-            logging.error("simple json parse error!!")
-            json = memcache.get("backup")
-        
-        if json:
-            if not fromcache:
-                memcache.set("backup",json)
-#        logging.info(json)
+    #        return
+            res = res.replace("google.visualization.Query.setResponse(","")
+            res = re.sub("\)\;$","",res)
+            res = res.replace("yyyy/MM/dd H:mm:ss","")
+            res = res.replace("#0.###############","")
+            res = re.sub("('style'\:\'[^\']+\')","",res)
+            res = re.sub("new Date\(([\d\,]+)\)","'\\1'",res)
+            res = res.replace('c:[,','c:[{v:\'\',f:\'\'},') #google spread sheetのバグ。日付型に文字がはいっているとオブジェクトが出力されない
+    
+    
+            res = re.sub("([{,])([a-z]+)\:","\\1'\\2':",res) #変数名をクオーテーションで囲む
+            res = re.sub(":([0-9]+)\.[0-9]+",":'\\1'",res) #小数点
+            res = res.replace('"','')
+            res = res.replace("\\n",' ')
+            res = res.replace("},","},\n") #改行をいれてデバッグしやすく
+            res = res.replace("'",'"') #ダブルクオーテーションじゃないとパースしてくれない
+    #        response.out.write(res)
+    #        return
+    #        self.response.out.write(res)
+    #        logging.info(res)
+           # res = '{"name": "John Smith", "age": 33}'
+            
+            try:
+                json = simplejson.loads(res)
+            except:
+                logging.error("simple json parse error!!")
+                json = memcache.get("backup")
+            
+            if json:
+                try:
+                    memcache.set("backup",json)
+                    memcache.set("cache_json",json,20)
+                except:
+                    logging.error("set memcache error!!")
+    #        logging.info(json)
         
         newrows = []
         
