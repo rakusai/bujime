@@ -15,14 +15,18 @@ from google.appengine.ext import db
 from google.appengine.api import urlfetch
 from google.appengine.api import memcache
 import urllib
+from django.utils import simplejson
 
-def getjson(q,page,limit,version,status,link):
+
+def getjson(response,q,page,limit,version,status,link):
         sql = "" #"select * "
         sql = urllib.quote(sql)
 #        url = "http://spreadsheets.google.com/tq?key=twenqTTEoUUigkPWhKdHhUA&tq=" + sql
-
+        
+        fromcache = True
         res = memcache.get("cache")
         if not res:
+            fromcache = False
             url = "http://spreadsheets.google.com/tq?key=tgjMrXxdYuNdW0JEMBi36bA"
             result = urlfetch.fetch(url)
             res  = result.content
@@ -35,31 +39,40 @@ def getjson(q,page,limit,version,status,link):
         res = res.replace("#0.###############","")
         res = re.sub("('style'\:\'[^\']+\')","",res)
         res = re.sub("new Date\(([\d\,]+)\)","'\\1'",res)
-#        res = re.sub("new Date\(([\d]+),([\d]+),([\d]+),([\d]+),([\d]+),([\d]+)\)","'\\1/\\2/\\3 \\4:\\5:\\6'",res)
-#        res = re.sub("(,p\:[^\}]+})","",res)
-        res = re.sub("([{,])([a-zA-Z]+)\:","\\1'\\2':",res)
+#        res = res.replace('c:[,','c:[{v:\'\',f:\'\'},') #google spread sheetのバグ。日付型に文字がはいっているとオブジェクトが出力されない
+
+
+        res = re.sub("([{,])([a-z]+)\:","\\1'\\2':",res) #変数名をクオーテーションで囲む
         res = re.sub(":([0-9]+)\.[0-9]+",":'\\1'",res) #小数点
         res = res.replace('"','')
-        res = res.replace("'",'"')
-        logging.info(res)
-#        return
-#        self.response.out.write(res)
+        res = res.replace("\\n",' ')
+        res = res.replace("},","},\n") #改行をいれてデバッグしやすく
+        res = res.replace("'",'"') #ダブルクオーテーションじゃないとパースしてくれない
+#        response.out.write(res)
 #        return
 #        self.response.out.write(res)
 #        logging.info(res)
        # res = '{"name": "John Smith", "age": 33}'
         
-        json = simplejson.loads(res)
+        try:
+            json = simplejson.loads(res)
+        except:
+            logging.error("simple json parse error!!")
+            json = memcache.get("backup")
+        
+        if json:
+            if not fromcache:
+                memcache.set("backup",json)
 #        logging.info(json)
         
         newrows = []
         
-        logging.info(json["table"]["rows"])
+#        logging.info(json["table"]["rows"])
         rows = json["table"]["rows"]
         for row in rows:
-            logging.info(row["c"][0]["v"])
-            logging.info(row["c"][1]["v"])
-            logging.info(row["c"][2]["v"])
+#            logging.info(row["c"][0]["v"])
+#            logging.info(row["c"][1]["v"])
+#            logging.info(row["c"][2]["v"])
             comment = row["c"][7]["v"]
             if link == 'yes': 
                 cgi.escape(comment)
@@ -88,6 +101,9 @@ def getjson(q,page,limit,version,status,link):
             "comment" : comment,
 #            "comment" : row["c"][7]["v"],
             })
+            
+        
+        #ここからフィルタリング
         rows = newrows
         if q:
             newrows = []
@@ -134,7 +150,7 @@ class MainPage(BasePage):
         status = self.request.get("status")
         link = self.request.get("link","")
         
-        newrows = getjson(q, page, limit,version,status,link)
+        newrows = getjson(self.response, q, page, limit,version,status,link)
             
         if format == "json":
             self.render_json(newrows)
