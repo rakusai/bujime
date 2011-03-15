@@ -1,5 +1,5 @@
 cron:
 - description: access to store cache of  genba
   url: /genba
-  schedule: every 20 seconds
+  schedule: every 3 minutes
 

@@ -45,7 +45,7 @@ def fetchjson(response,key):
     res = res.replace("},,{","},{v:''},{") #spread sheetのバグ対応
 
     res = re.sub("([{,])([a-z]+)\:","\\1'\\2':",res) #変数名をクオーテーションで囲む
-    res = re.sub(":([0-9]+)\.[0-9]+",":'\\1'",res) #小数点
+    res = re.sub(":([0-9]+)\.[0-9]+",":'\\1'",res) #小数点切り捨て
     res = res.replace('"','')
     res = res.replace("\\n",' ')
     res = res.replace("},","},\n") #改行をいれてデバッグしやすく
@@ -65,7 +65,7 @@ def fetchjson(response,key):
     if json:
         try:
             memcache.set("backup/"+key,json)
-            memcache.set("cache_json/"+key,json,20)
+            memcache.set("cache_json/"+key,json,60*3)
         except:
             logging.error("set memcache error!!")
 #        logging.info(json)
@@ -180,7 +180,7 @@ class GenbaPage(BasePage):
         page = int(self.request.get("page",1)) or 1
         limit = int(self.request.get("limit",60)) or 60
 
-        key = 'tFoqCAAfNuMdwK6_DAeN3CQ'
+        key = 't1aygyrFxv9VEjHcXUbfHxQ'
         json = fetchjson(self.response,key)
         newrows = []
         
