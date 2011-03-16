@@ -91,6 +91,12 @@ def addlink(str):
 
 def getjson(response,q,page,limit,version,status,link):
         
+    cachekey = q+"/"+str(page)+"/"+str(limit)+"/"+str(version)+"/"+status+"/"+link
+    
+    cache =  memcache.get("gj//" + cachekey)
+    if cache:
+        return cache
+    
     key = 'tgjMrXxdYuNdW0JEMBi36bA'
     json = fetchjson(response,key)
     newrows = []
@@ -147,6 +153,7 @@ def getjson(response,q,page,limit,version,status,link):
                 "maxpage":int(count/limit)+1,
                 "rows":newrows}
 
+    memcache.set("gj//" + cachekey,result,60)
     return result
         
 class MainPage(BasePage):

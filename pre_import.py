@@ -6,6 +6,7 @@ import logging
 import datetime
 import random
 import re
+import md5
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
